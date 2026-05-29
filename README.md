@@ -35,13 +35,13 @@ Up to 55 units supported (IPs .201–.255).
 
 ```
 Firmware/
-├── Spaceknot_v210/   ← active firmware (open this one)
+├── Spaceknot_v224/   ← active firmware (open this one)
 └── Archive/          ← all previous versions
 ```
 
-Open `Firmware/Spaceknot_v210/Spaceknot_v210.ino` in Arduino IDE.
+Open `Firmware/Spaceknot_v224/Spaceknot_v224.ino` in Arduino IDE.
 
-Compiled binaries are in `releases/` — use `Sketch → Export Compiled Binary` in Arduino IDE, then copy `Spaceknot_v210.ino.bin` there.
+Compiled binaries are in `releases/` — use `Sketch → Export Compiled Binary` in Arduino IDE, then copy `Spaceknot_v224.ino.bin` there.
 
 **Dependencies (Arduino Library Manager)**
 
@@ -73,7 +73,7 @@ After the initial USB flash, subsequent updates can be pushed wirelessly:
 
 **Via Arduino IDE:** The unit appears as a network port under `Tools → Port` once on the network. Select it and upload normally.
 
-**Via web interface:** Go to the unit's IP → Settings → Configure → pick a `.bin` file → Flash firmware. Export the binary from Arduino IDE with `Sketch → Export Compiled Binary` — use `Spaceknot_v210.ino.bin`.
+**Via web interface:** Go to the unit's IP → Settings → Configure → pick a `.bin` file → Flash firmware. Export the binary from Arduino IDE with `Sketch → Export Compiled Binary` — use `Spaceknot_v224.ino.bin`.
 
 ---
 

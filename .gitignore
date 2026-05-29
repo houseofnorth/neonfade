@@ -16,8 +16,6 @@ Firmware/**/*.hex
 # Arduino IDE
 Firmware/**/.arduino15/
 
-# Router backups (large binary, not firmware)
-Router backup/
 
 # Cowork / Claude internal files
 CLAUDE.md
