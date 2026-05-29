@@ -35,13 +35,8 @@ Up to 55 units supported (IPs .201–.255).
 
 ```
 Firmware/
-├── Spaceknot_v210/      ← active firmware (open this one)
-├── NeonFade_Test/       ← hardware bring-up test sketches
-├── NeonFade_v2/         ← earlier modular prototype
-├── NeonFade_v1.2.4/     ← legacy
-├── Neonfade_v001/       ← legacy
-├── ShellyButtonTest/    ← isolated Shelly MQTT test
-└── Xiao Matter/         ← exploratory, do not use
+├── Spaceknot_v210/   ← active firmware (open this one)
+└── Archive/          ← all previous versions
 ```
 
 Open `Firmware/Spaceknot_v210/Spaceknot_v210.ino` in Arduino IDE.
