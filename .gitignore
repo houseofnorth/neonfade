@@ -5,6 +5,9 @@ Firmware/**/*.elf
 Firmware/**/*.map
 Firmware/**/*.hex
 
+# Allow compiled releases
+!releases/*.bin
+
 # macOS
 .DS_Store
 **/.DS_Store

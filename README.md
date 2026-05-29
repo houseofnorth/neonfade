@@ -41,6 +41,8 @@ Firmware/
 
 Open `Firmware/Spaceknot_v210/Spaceknot_v210.ino` in Arduino IDE.
 
+Compiled binaries are in `releases/` — use `Sketch → Export Compiled Binary` in Arduino IDE, then copy `Spaceknot_v210.ino.bin` there.
+
 **Dependencies (Arduino Library Manager)**
 
 - `PubSubClient` by Nick O'Leary
