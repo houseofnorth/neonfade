@@ -1,0 +1,152 @@
+═══════════════════════════════════════════════════════════════
+  NeonFade PCB — Hardware Test Instructions
+  Firmware: NeonFade_Test
+  Board: Neon Fader BRD mkIII v367
+═══════════════════════════════════════════════════════════════
+
+EQUIPMENT
+  - Multimeter (DC voltage)
+  - USB-C cable (to XIAO ESP32C3)
+  - Serial monitor @ 115200 baud
+  - Mains supply (230V) OR bench 5V on 5V_SYS / GND if mains not available
+
+BLACK PROBE: TP '5-' (GND) throughout all measurements.
+
+
+───────────────────────────────────────────────────────────────
+STEP 1 — Power rails  (PSU only, no MCU needed)
+───────────────────────────────────────────────────────────────
+Apply mains power. Do NOT plug in USB yet.
+
+  TP      Net         Expected        Pass if
+  ─────   ─────────   ───────────     ───────────────────────
+  5+      +5V_SYS     5.0 V           4.75 – 5.25 V
+  5-      GND         0 V             reference
+
+Fail: PSU not outputting — check fuse, check RECOM orientation.
+
+
+───────────────────────────────────────────────────────────────
+STEP 2 — MCU boot  (plug in USB-C, open serial monitor)
+───────────────────────────────────────────────────────────────
+Serial should print:
+
+  === NeonFade Test Firmware ===
+  Sweep pot full range to calibrate (15 s timeout).
+
+LED_A (D7) fast-blinks — waiting for calibration.
+LED_B (D8) OFF.
+
+  TP      Net         Expected        Pass if
+  ─────   ─────────   ───────────     ───────────────────────
+  5+      +5V_SYS     5.0 V           unchanged from Step 1
+  9       D9/MISO     ~3.3 V          3.1 – 3.4 V (idle GPIO)
+  10      D10/MOSI    ~3.3 V          3.1 – 3.4 V (idle GPIO)
+  1       D1          ~3.3 V          3.1 – 3.4 V (idle GPIO)
+
+Fail: No serial output — check USB driver / board selection (XIAO ESP32C3).
+
+
+───────────────────────────────────────────────────────────────
+STEP 3 — Relay toggle  (starts immediately on boot)
+───────────────────────────────────────────────────────────────
+No calibration needed. Relay toggles every 1 second from boot.
+You will hear/feel the relay clicking.
+
+  TP      Net         Relay OFF       Relay ON
+  ─────   ─────────   ───────────     ───────────────────────
+  R       R (coil-)   ~5.0 V          ~0.1 V
+
+Serial column RLY alternates OFF / ON every second.
+LED_A mirrors relay: ON when relay energised.
+
+Fail: TP R stuck at 5V — check IC2 (MMBT3904), R10, D6 connection.
+Fail: TP R stuck at 0V — check relay coil continuity / K1 solder joints.
+
+
+───────────────────────────────────────────────────────────────
+STEP 4 — Pot sweep calibration
+───────────────────────────────────────────────────────────────
+Within 15 seconds of boot, slowly turn the motorpot
+from full left to full right (full mechanical travel).
+
+Watch serial — MIN and MAX columns should track your sweep.
+
+Serial will print when done:
+  Calibrated: min=NNN  max=NNN  range=NNN
+
+  TP      Net         Expected during sweep
+  ─────   ─────────   ───────────────────────────────────────
+  W1      WIP1        0 – 3.3 V, sweeps smoothly with pot
+  W2      DIM2        0 – 3.3 V, mirrors W1
+
+Range should be > 2000 ADC counts for a valid calibration.
+If timeout fires (15 s), firmware uses defaults (150 – 3900).
+
+Fail: W1 stuck — check R5 (1kΩ) and pot Gang A wiring.
+Fail: W2 stuck — check pot Gang B wiring to J1.
+
+
+───────────────────────────────────────────────────────────────
+STEP 5 — Motor oscillation  (starts after calibration)
+───────────────────────────────────────────────────────────────
+Motor begins driving between calibrated MIN and MAX automatically.
+
+  TP      Net         Motor idle      Motor running
+  ─────   ─────────   ───────────     ───────────────────────
+  M1      MTR2        0 V             PWM ~0–5 V (one direction)
+  M2      MTR1        0 V             PWM ~0–5 V (other direction)
+
+Only ONE of M1/M2 is active at a time. They alternate as the
+motor reverses. Measure with DC setting — meter will read
+average voltage proportional to duty (~3.9 V at speed 200/255).
+
+Serial MOT column shows: FORWARD / REVERSE / STOP
+LED_B: ON when FORWARD, OFF when REVERSE.
+
+Pot wiper (W1) should sweep back and forth in sync with motor travel.
+
+Fail: Motor not moving — check L293DD (IC1) solder joints, VM rail.
+Fail: Motor runs one way only — check both PWM channels on M1 and M2.
+Fail: Motor runs but doesn't reverse — pot feedback broken (re-check W1).
+
+
+───────────────────────────────────────────────────────────────
+STEP 6 — I2C bus  (OLED connector J2)
+───────────────────────────────────────────────────────────────
+Measure at J2 Qwiic connector or R6/R7 top pads.
+
+  Pin     Net         Expected (idle, no OLED)
+  ─────   ─────────   ───────────────────────
+  SDA     D4          3.3 V (pulled up via R6 4.7kΩ)
+  SCL     D5          3.3 V (pulled up via R7 4.7kΩ)
+  VCC     +3V3        3.3 V
+  GND     GND         0 V
+
+Fail: SDA/SCL low — check R6/R7 solder joints.
+
+
+───────────────────────────────────────────────────────────────
+SERIAL MONITOR — column reference
+───────────────────────────────────────────────────────────────
+  POT    — raw ADC reading (0–4095)
+  MIN    — lowest ADC seen since boot
+  MAX    — highest ADC seen since boot
+  MOTOR  — FORWARD / REVERSE / STOP
+  RELAY  — ON / OFF (1 Hz toggle)
+  CALIB  — ... = waiting,  OK = calibrated
+
+
+───────────────────────────────────────────────────────────────
+PASS CRITERIA SUMMARY
+───────────────────────────────────────────────────────────────
+  [ ] 5V rail: 4.75 – 5.25 V
+  [ ] 3.3V idle GPIOs (1, 9, 10): 3.1 – 3.4 V
+  [ ] Relay clicking at 1 Hz; TP R swings 5V ↔ 0.1V
+  [ ] Pot sweep: W1 and W2 follow pot travel 0–3.3V
+  [ ] Calibration message printed, range > 2000
+  [ ] Motor oscillates; M1/M2 alternate PWM
+  [ ] W1 sweeps in sync with motor travel
+  [ ] SDA/SCL idle at 3.3V
+
+═══════════════════════════════════════════════════════════════

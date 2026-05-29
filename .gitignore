@@ -1,0 +1,24 @@
+# Build artifacts
+Firmware/**/build/
+Firmware/**/*.bin
+Firmware/**/*.elf
+Firmware/**/*.map
+Firmware/**/*.hex
+
+# macOS
+.DS_Store
+**/.DS_Store
+._*
+
+# Arduino IDE
+Firmware/**/.arduino15/
+
+# Router backups (large binary, not firmware)
+Router backup/
+
+# Cowork / Claude internal files
+CLAUDE.md
+*.skill
+
+# Credentials (never commit)
+**/secrets.h
