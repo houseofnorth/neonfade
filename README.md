@@ -1,6 +1,6 @@
 # Spaceknot
 
-Motorised dimmer controller for networked multi-room lighting. Custom PCBs each drive an ALPS RK168 motorised pot via an L293DD H-bridge, controlled by two Shelly Dimmer Gen4 buttons over MQTT. Built and installed at Waldmannstrasse, Berlin.
+Motorised dimmer controller for networked multi-room lighting. Custom PCBs each drive an ALPS RK168 motorised pot via an L293DD H-bridge, controlled by two Shelly Dimmer Gen4 buttons over MQTT. 
 
 ---
 
