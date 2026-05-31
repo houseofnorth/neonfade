@@ -1,8 +1,6 @@
-# Spaceknot Neon Controller
+# Spaceknot
 
-![Neonfade v422 top](https://github.com/houseofnorth/neonfade/raw/main/Neonfade%20v422%20top.png)
-
-Motorised dimmer controller for networked multi-room lighting. Custom PCBs each drive an ALPS RK168 motorised pot via an L293DD H-bridge, controlled by two Shelly Dimmer Gen4 buttons over MQTT. 
+Motorised dimmer controller for networked multi-room lighting. Custom PCBs each drive an ALPS RK168 motorised pot via an L293DD H-bridge, controlled by two Shelly Dimmer Gen4 buttons over MQTT. Built and installed at Waldmannstrasse, Berlin.
 
 ---
 
@@ -37,13 +35,13 @@ Up to 55 units supported (IPs .201–.255).
 
 ```
 Firmware/
-├── Spaceknot_v224/   ← active firmware (open this one)
+├── Spaceknot_v227/   ← active firmware (open this one)
 └── Archive/          ← all previous versions
 ```
 
-Open `Firmware/Spaceknot_v224/Spaceknot_v224.ino` in Arduino IDE.
+Open `Firmware/Spaceknot_v227/Spaceknot_v227.ino` in Arduino IDE.
 
-Compiled binaries are in `releases/` — use `Sketch → Export Compiled Binary` in Arduino IDE, then copy `Spaceknot_v224.ino.bin` there.
+Compiled binaries are in `releases/` — use `Sketch → Export Compiled Binary` in Arduino IDE, then copy `Spaceknot_v227.ino.bin` there.
 
 **Dependencies (Arduino Library Manager)**
 
@@ -75,7 +73,7 @@ After the initial USB flash, subsequent updates can be pushed wirelessly:
 
 **Via Arduino IDE:** The unit appears as a network port under `Tools → Port` once on the network. Select it and upload normally.
 
-**Via web interface:** Go to the unit's IP → Settings → Configure → pick a `.bin` file → Flash firmware. Export the binary from Arduino IDE with `Sketch → Export Compiled Binary` — use `Spaceknot_v224.ino.bin`.
+**Via web interface:** Go to the unit's IP → Settings → Configure → pick a `.bin` file → Flash firmware. Export the binary from Arduino IDE with `Sketch → Export Compiled Binary` — use `Spaceknot_v227.ino.bin`. OTA password: `spaceknot`
 
 ---
 
@@ -98,11 +96,18 @@ Baud rate: **115200**
 
 **Range calibration flow**
 
-1. `C` — enter cal mode (relay on, motor enabled)
+*Via web UI (recommended):*
+1. Click **Recalibrate Range** — cal panel opens, live ADC readout appears on bar
+2. Hold **Drive FWD** or **Drive REV** to motor the pot to each hard stop
+3. Click **Capture MIN** at one end, **Capture MAX** at the other
+4. Click **Save Range** — broadcasts to all units via MQTT
+
+*Via Serial Monitor:*
+1. `C` — enter cal mode
 2. Move pot to one end → `L` (MIN)
 3. Move pot to other end → `R` (MAX)
 4. Alternatively: `A` to auto-sweep, then `A` again to stop
-5. `S` to save (requires ≥ 500 ADC count span)
+5. `S` to save
 
 ---
 
@@ -113,10 +118,10 @@ Broker: `192.168.2.1:1883` — Mosquitto on GL.iNet router, no authentication.
 | Topic | Direction | Payload |
 |---|---|---|
 | `spaceknot/state` | pub/sub | `Day` / `Dusk` / `Night` / `OFF` |
-| `spaceknot/cal` | pub/sub | `start` / `min` / `max` / `auto` / `save` / `cancel` / `capDay` / `capDusk` / `capNight` |
+| `spaceknot/cal` | pub/sub | `start` / `min:NNN` / `max:NNN` / `auto` / `save` / `cancel` / `capDay:NNN` / `capDusk:NNN` / `capNight:NNN` / `setrange:NNN:MMM` |
 | `+/events/rpc` | sub | Shelly Gen4 RPC event JSON (`single_push` / `long_push`) |
 
-All units subscribe to `spaceknot/state` and `spaceknot/cal`. A calibration command from any unit's web UI broadcasts to all units — each captures its own pot position.
+All units subscribe to `spaceknot/state` and `spaceknot/cal`. A calibration command from any unit's web UI broadcasts to all units. min/max/capXxx messages carry the master unit's captured ADC value so all units receive identical calibration numbers.
 
 ---
 
